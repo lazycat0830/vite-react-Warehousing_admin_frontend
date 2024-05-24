@@ -1,0 +1,26 @@
+@import "../../mixin/color.scss";
+
+.tableDiv {
+  width: 100%;
+  max-height: calc(90vh - 126px);
+  overflow: hidden;
+  overflow-y: scroll;
+  border: 1px #ddd solid;
+  .table {
+    table-layout: fixed;
+    tbody {
+      tr td {
+        text-align: center;
+        max-height: 100px;
+      }
+    }
+    thead tr th {
+      text-align: center;
+      position: sticky;
+      top: -0.1px;
+      background-color: #fff;
+      border-bottom: 1px #ddd solid;
+      z-index: 2;
+    }
+  }
+}
