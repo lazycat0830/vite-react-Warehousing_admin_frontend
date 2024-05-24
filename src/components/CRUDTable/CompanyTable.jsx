@@ -23,12 +23,11 @@ import {
   faSearch,
   faEdit,
   faTrash,
-  faBox,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import "./CompanyTable.scss";
 
-const ProductTable = ({rows = [],openModal}) => {
+const CompanyTable = ({rows = [],openModal}) => {
   const [activePage, setActivitePage] = useState(1);
   const [itemPage, setitemPage] = useState(10);
   const [isListChange, setIsListChange] = useState(false);
@@ -69,7 +68,7 @@ const ProductTable = ({rows = [],openModal}) => {
   };
 
   const tbRows = _.map(paginatedData[activePage - 1], (row, index) => (
-    <Table.Tr key={row.pro_id}>
+    <Table.Tr key={row.com_id}>
       {isListChange && (
         <Table.Td>
           <Checkbox
@@ -80,27 +79,12 @@ const ProductTable = ({rows = [],openModal}) => {
           />
         </Table.Td>
       )}
+      <Table.Td>{row.com_homemadeName ? row.com_homemadeName : "無"}</Table.Td>
+      <Table.Td>{row.com_name}</Table.Td>
+      <Table.Td>{row.com_phone ? row.com_phone : "無"}</Table.Td>
       <Table.Td>
-        <div>
-          <Image
-            radius="xs"
-            height={75}
-            fit="scale-down"
-            src={row.pro_img}
-            alt={`img${row.pro_id}`}
-            fallbackSrc={`https://placehold.co/600x400?text=${!row.pro_homemadeName ? row.pro_comName : row.pro_homemadeName}`}
-          />
-        </div>
-        {/* <img
-          style={{ maxHeight: "75px", verticalAlign: "middle" }}
-          src={row.pro_img}
-          alt={`img${row.pro_id}`}
-        /> */}
+        <Text truncate>{row.com_address ? row.com_address : "無"}</Text>
       </Table.Td>
-      <Table.Td>${row.pro_price}</Table.Td>
-      <Table.Td>${row.pro_cost}</Table.Td>
-      <Table.Td>{row.pro_comName}</Table.Td>
-      <Table.Td>{row.pro_homemadeName}</Table.Td>
       <Table.Td>
         <Group position="center" spacing="xs" grow>
           <Tooltip label="修改">
@@ -112,13 +96,13 @@ const ProductTable = ({rows = [],openModal}) => {
               <Icon icon={faEdit}></Icon>
             </ActionIcon>
           </Tooltip>
-          <Tooltip label="下架">
+          <Tooltip label=" 刪除">
             <ActionIcon
               variant="outline"
               color="red"
               onClick={() => openModal("delete", row)}
             >
-              <Icon icon={faBox}></Icon>
+              <Icon icon={faTrash}></Icon>
             </ActionIcon>
           </Tooltip>
         </Group>
@@ -132,7 +116,7 @@ const ProductTable = ({rows = [],openModal}) => {
     paginatedData.forEach((page) => {
       page.forEach((row) => {
         if (row.checked) {
-          checkedItems.push(row.pro_id);
+          checkedItems.push(row.com_id);
         }
       });
     });
@@ -148,8 +132,8 @@ const ProductTable = ({rows = [],openModal}) => {
   };
 
   return (
-    <div id="ProductTable">
-      <Group position="apart" spacing="xs" style={{ paddingBottom: "6px" }}>
+    <div id="CompanyTable">
+      <Group justify="space-between" spacing="xs" pb={6}>
         <Group>
           <Button onClick={clearCheck}>{isListChange ? "取消" : "選擇"}</Button>
           {isListChange && <Button onClick={onSubmit}>刪除</Button>}
@@ -195,11 +179,10 @@ const ProductTable = ({rows = [],openModal}) => {
                   />
                 </Table.Th>
               )}
-              <Table.Th>圖片</Table.Th>
-              <Table.Th>原價格</Table.Th>
-              <Table.Th>成本</Table.Th>
-              <Table.Th>廠商商品名稱</Table.Th>
-              <Table.Th>自訂商品名稱</Table.Th>
+              <Table.Th style={{ width: "8%" }}>廠商編號</Table.Th>
+              <Table.Th>廠商名稱</Table.Th>
+              <Table.Th>廠商電話</Table.Th>
+              <Table.Th>廠商地址</Table.Th>
               <Table.Th style={{ width: "15%" }}>操作</Table.Th>
             </Table.Tr>
           </Table.Thead>
@@ -213,7 +196,7 @@ const ProductTable = ({rows = [],openModal}) => {
           </Table.Tbody>
         </Table>
       </div>
-      <Group position="center" style={{ marginTop: "12px" }}>
+      <Group justify="center" style={{ marginTop: "12px" }}>
         <Pagination
           total={maxPage}
           value={activePage}
@@ -225,4 +208,5 @@ const ProductTable = ({rows = [],openModal}) => {
   );
 };
 
-export default ProductTable;
+
+export default CompanyTable;

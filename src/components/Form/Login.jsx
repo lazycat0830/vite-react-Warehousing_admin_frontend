@@ -16,7 +16,7 @@ import { connect } from "react-redux";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 
 
-const LoginForm = (props) => {
+const LoginForm = ({onSubmit}) => {
 
   const Form = useForm({
     initialValues: {
@@ -29,12 +29,12 @@ const LoginForm = (props) => {
     },
   });
 
-  const onSubmit = Form.onSubmit((values) =>{
-    props.onSubmit(values);
+  const SubmitForm = Form.onSubmit((values) =>{
+    onSubmit(values);
   });
 
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={SubmitForm}>
       <Stack>
         <TextInput
           required

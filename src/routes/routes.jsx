@@ -5,6 +5,11 @@ import Dashboard from '../pages/backdesk/Dashboard/Dashboard'
 import OrderMean from "../pages/backdesk/OrderMean/OrderMean"
 import Product from '../pages/backdesk/Product/Product'
 import ProductType from '../pages/backdesk/Product/ProductType'
+import Inventory from '../pages/backdesk/Inventory/Inventory'
+import Component from '../pages/backdesk/Inventory/Company/Company'
+import Purchase from '../pages/backdesk/Inventory/Purchase/Purchase'
+import ReportAnalysis from '../pages/backdesk/ReportAnalysis/ReportAnalysis'
+import Setting from '../pages/backdesk/Setting/Setting'
 
 import SalesInerface from "../pages/frontdesk/sales/SalesInerface"
 
@@ -46,23 +51,23 @@ export const router = createBrowserRouter([
       },
       {
         path: "/backdesk/Inventory/Inventory",
-        element: <Dashboard/>,
+        element: <Inventory/>,
       },
       {
         path: "/backdesk/Inventory/Purchase",
-        element: <Dashboard/>,
+        element: <Purchase/>,
       },
       {
         path: "/backdesk/Inventory/Company",
-        element: <Dashboard/>,
+        element: <Component/>,
       },
       {
         path: "/backdesk/ReportAnalysis",
-        element: <Dashboard/>,
+        element: <ReportAnalysis/>,
       },
       {
         path: "/backdesk/Setting",
-        element: <Dashboard/>,
+        element: <Setting/>,
       },
     ],
   },

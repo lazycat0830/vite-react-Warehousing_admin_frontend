@@ -27,13 +27,13 @@ import {
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import "./CompanyTable.scss";
 
-const ProductTypeTable = (props) => {
+const ProductTypeTable = ({rows = [],openModal}) => {
   const [activePage, setActivitePage] = useState(1);
   const [itemPage, setitemPage] = useState(10);
   const [isListChange, setIsListChange] = useState(false);
   const [paginatedData, setPaginatedData] = useState([]);
   const [allChecked, setAllChecked] = useState(false);
-  const { rows } = props;
+
 
   useEffect(() => {
     const editPaginatedData = _.chunk(
@@ -69,26 +69,26 @@ const ProductTypeTable = (props) => {
   };
 
   const tbRows = _.map(paginatedData[activePage - 1], (row, index) => (
-    <tr key={row.type_id}>
+    <Table.Tr key={row.type_id}>
       {isListChange && (
-        <td>
+        <Table.Td>
           <Checkbox
             checked={row.checked}
             onChange={() => SpecifyCheckboxChange(index)}
             style={{ display: "flex", justifyContent: "center" }}
             alt="check"
           />
-        </td>
+        </Table.Td>
       )}
-      <td>{index + 1}</td>
-      <td>{row.type_title}</td>
-      <td>
+      <Table.Td>{index + 1}</Table.Td>
+      <Table.Td>{row.type_title}</Table.Td>
+      <Table.Td>
         <Group position="center" spacing="xs" grow>
           <Tooltip label="修改">
             <ActionIcon
               variant="outline"
               color="indigo"
-              onClick={() => props.openModal("edit", row)}
+              onClick={() => openModal("edit", row)}
             >
               <Icon icon={faEdit}></Icon>
             </ActionIcon>
@@ -97,14 +97,14 @@ const ProductTypeTable = (props) => {
             <ActionIcon
               variant="outline"
               color="red"
-              onClick={() => props.openModal("delete", row)}
+              onClick={() => openModal("delete", row)}
             >
               <Icon icon={faTrash}></Icon>
             </ActionIcon>
           </Tooltip>
         </Group>
-      </td>
-    </tr>
+      </Table.Td>
+    </Table.Tr>
   ));
 
   // 刪除多廠商
@@ -137,14 +137,14 @@ const ProductTypeTable = (props) => {
         </Group>
         <Group>
           <Button
-            onClick={() => props.openModal("addCSV")}
-            leftIcon={<Icon icon={faPlusSquare} />}
+            onClick={() => openModal("addCSV")}
+            leftSection={<Icon icon={faPlusSquare} />}
           >
             CSV新增
           </Button>
           <Button
-            onClick={() => props.openModal("add")}
-            leftIcon={<Icon icon={faPlusSquare} />}
+            onClick={() => openModal("add")}
+            leftSection={<Icon icon={faPlusSquare} />}
           >
             新增
           </Button>
@@ -161,10 +161,10 @@ const ProductTypeTable = (props) => {
       </Group>
       <div className="tableDiv">
         <Table className="table">
-          <thead>
-            <tr>
+          <Table.Thead>
+            <Table.Tr>
               {isListChange && (
-                <th style={{ width: "5%" }}>
+                <Table.Th style={{ width: "5%" }}>
                   <Checkbox
                     checked={allChecked}
                     onChange={AllCheckboxChange}
@@ -174,21 +174,21 @@ const ProductTypeTable = (props) => {
                     }}
                     alt="check"
                   />
-                </th>
+                </Table.Th>
               )}
-              <th style={{ width: "8%" }}>續號</th>
-              <th>類型名稱</th>
-              <th style={{ width: "15%" }}>操作</th>
-            </tr>
-          </thead>
-          <tbody>
+              <Table.Th style={{ width: "8%" }}>續號</Table.Th>
+              <Table.Th>類型名稱</Table.Th>
+              <Table.Th style={{ width: "15%" }}>操作</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
             {rows.length > 0 && tbRows}
             {rows.length === 0 && (
-              <tr>
-                <td colSpan={3}>查無資料</td>
-              </tr>
+              <Table.Tr>
+                <Table.Td colSpan={3}>查無資料</Table.Td>
+              </Table.Tr>
             )}
-          </tbody>
+          </Table.Tbody>
         </Table>
       </div>
       <Group position="center" style={{ marginTop: "12px" }}>
@@ -203,8 +203,5 @@ const ProductTypeTable = (props) => {
   );
 };
 
-ProductTypeTable.defaultProps = {
-  rows: [],
-};
 
 export default ProductTypeTable;

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { connect } from "react-redux";
 import _ from "lodash";
-import { Card, Image, Text, ScrollArea, SimpleGrid, Menu } from "@mantine/core";
+import { Card, Image, Text, ScrollArea, SimpleGrid, Menu,Grid  } from "@mantine/core";
 
 const colList=[
   { maxWidth: 1440, cols: 3, spacing: "md" },
@@ -9,12 +9,13 @@ const colList=[
   { maxWidth: 425, cols: 1, spacing: "sm" },
 ]
 
-const ProductList = ({row = []}) => {
+const ProductList = ({rows = []}) => {
   return (
     <ScrollArea style={{ height: "75vh" }}>
-      <SimpleGrid cols={4}>
+      <Grid >
         {_.map([1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4], (i, index) => (
-          <Menu key={index} offset={2} position="Bottom">
+          <Grid.Col span={{base: 12, xs: 12, sm: 4, lg: 4,xl:3 }} key={index}>
+            <Menu offset={2} position="Bottom">
             <Menu.Target>
               <Card
                 shadow="sm"
@@ -31,8 +32,7 @@ const ProductList = ({row = []}) => {
                       src="https://images.unsplash.com/photo-1579227114347-15d08fc37cae?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2550&q=80"
                       height={150}
                       alt="No way!"
-                      withPlaceholder
-                      placeholder={<Text align="center">{"1"}</Text>}
+                      fallbackSrc={`https://placehold.co/600x400?text=${1}`}
                     />
                   </div>
                 </Card.Section>
@@ -47,8 +47,9 @@ const ProductList = ({row = []}) => {
               <Menu.Item color="red">紅色 41</Menu.Item>
             </Menu.Dropdown>
           </Menu>
+          </Grid.Col>
         ))}
-      </SimpleGrid>
+      </Grid>
     </ScrollArea>
   );
 };

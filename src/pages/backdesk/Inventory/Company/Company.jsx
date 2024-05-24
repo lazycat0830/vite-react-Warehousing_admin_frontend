@@ -1,9 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useRef } from "react";
-import _, { size } from "lodash";
+import _ from "lodash";
 import moment from "moment";
 import { connect } from "react-redux";
-import { useForm } from "@mantine/form";
 import {
   Text,
   Switch,
@@ -17,8 +16,6 @@ import {
   ActionIcon,
   Button,
   Modal,
-  Select,
-  MultiSelect,
 } from "@mantine/core";
 import {
   faPlusSquare,
@@ -26,19 +23,24 @@ import {
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
-import ProductTable from "../../../components/CRUDTable/ProductTable";
-import ProductForm from "../../../components/Form/ProductForm";
+import CompanyTable from "../../../../components/CRUDTable/CompanyTable";
+import CompanyForm from "../../../../components/Form/CompanyForm";
 
-const Product = (props) => {
+const Company = (props) => {
   const [token, setToken] = useState(null);
   const [times, setTimes] = useState(0);
   const [openedModal, setOpenedModal] = useState(false);
   const [modalType, setModalType] = useState("add");
   const [EditRow, setEditRow] = useState({});
   const [csvFile, setCsvFile] = useState(null);
-  const { GET_GetAllProduct, GET_dropDownInventory, GET_dropDownProductType } =
-    props;
-  const { AllProduct, Company, ProductType } = props;
+  const {
+    GET_AllCompany,
+    POST_AddCompany,
+    PUT_EditCompany,
+    PUT_DelCompany,
+    POST_AddCompanyCsv,
+  } = props;
+  const { AllCompany } = props;
 
   useEffect(() => {
     const getToken = async () => {
@@ -56,23 +58,48 @@ const Product = (props) => {
   useEffect(() => {
     const fetch = async () => {
       if (token) {
-        await GET_GetAllProduct();
-        await GET_dropDownInventory();
-        await GET_dropDownProductType();
+        await GET_AllCompany();
       }
     };
     fetch();
-  }, [
-    token,
-    GET_GetAllProduct,
-    GET_dropDownInventory,
-    GET_dropDownProductType,
-  ]);
+  }, [token, GET_AllCompany]);
+
   const ModalTitles = {
-    add: "新增商品",
-    edit: "修改商品",
-    delete: "下架商品",
-    addCSV: "csv檔新增商品",
+    add: "新增廠商",
+    edit: "修改廠商",
+    delete: "刪除廠商",
+    addCSV: "csv檔新增廠商",
+  };
+  // 新增/修改送出
+  const onSubmit = async (values, type) => {
+    const {
+      com_homemadeName,
+      com_name,
+      com_address,
+      com_phone,
+      discount,
+      payDay,
+      com_id,
+    } = values;
+    const body = {
+      com_homemadeName: com_homemadeName,
+      com_name: com_name,
+      com_address: com_address,
+      com_phone: com_phone,
+      discount: discount,
+      payDay: payDay,
+    };
+    // console.log("type",type);
+    // console.log("addCompany",body);
+    if (com_name) {
+      if (type === "add") {
+        await POST_AddCompany(body);
+      } else if (type === "edit") {
+        body.com_id = com_id;
+        await PUT_EditCompany(body);
+      }
+      setOpenedModal(false);
+    }
   };
 
   // 開啟彈窗
@@ -87,69 +114,46 @@ const Product = (props) => {
     setOpenedModal(false);
   };
 
-  const onSubmit = (value, img, type) => {
-    console.log(value, img, type);
-    const {
-      pro_id,
-      com_id,
-      pro_comName,
-      pro_homemadeName,
-      type_id,
-      pro_cost,
-      pro_price,
-      pro_color,
-      pro_size,
-    } = value;
+  // 刪除
+  const deleteForm = async () => {
+    const body = { ListCom: [EditRow?.com_id] };
+    if (EditRow?.com_id) {
+      await PUT_DelCompany(body);
+      setOpenedModal(false);
+    }
+  };
+  // 用csv檔新增
+  const addCsvForm = async () => {
     const data = new FormData();
-    data.append("com_id", com_id);
-    data.append("pro_comName", pro_comName);
-    data.append("pro_homemadeName", pro_homemadeName);
-    data.append("type_id", type_id);
-    data.append("pro_cost", pro_cost);
-    data.append("pro_price", pro_price);
-    data.append("pro_style", JSON.stringify({color:pro_color,size:pro_size}));
-    data.append("pro_img", img);
-    if (com_id) {
-      if (type === "add") {
-        // await POST_AddCompany(body);
-      } else if (type === "edit") {
-        data.append("pro_id", pro_id);
-        // await PUT_EditCompany(body);
-      }
+    data.append("Company", csvFile);
+    if (csvFile) {
+      await POST_AddCompanyCsv(data);
       setOpenedModal(false);
     }
   };
 
   return (
-    <div id="Product">
-      <ProductTable rows={AllProduct} openModal={openModal} />
+    <div id="Company">
+      <CompanyTable rows={AllCompany} openModal={openModal} />
       <Modal
-        size="xl"
         opened={openedModal}
         onClose={() => setOpenedModal(false)}
         title={ModalTitles[modalType]}
       >
         {modalType === "add" && (
-          <ProductForm
-            resetForm={resetForm}
-            onSubmit={onSubmit}
-            type={"add"}
-            comDropDown={Company}
-            typeDropDown={ProductType}
-          />
+          <CompanyForm onSubmit={onSubmit} resetForm={resetForm} type={"add"} />
         )}
         {modalType === "edit" && (
-          <ProductForm
-            resetForm={resetForm}
+          <CompanyForm
             onSubmit={onSubmit}
+            resetForm={resetForm}
+            editRow={EditRow}
             type={"edit"}
-            comDropDown={Company}
-            typeDropDown={ProductType}
           />
         )}
         {modalType === "delete" && (
           <Stack>
-            <Text>確認是否下架?</Text>
+            <Text>確認是否刪除?</Text>
             <Group position="right" spacing="xs">
               <Button
                 type="button"
@@ -189,24 +193,28 @@ const Product = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    AllProduct: _.get(state, "product.AllProduct", []),
-    Company: _.get(state, "dropDown.Company", []),
-    ProductType: _.get(state, "dropDown.ProductType", []),
+    AllCompany: _.get(state, "company.AllCompany", []),
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    GET_GetAllProduct(payload, callback, loading) {
-      dispatch({ type: "GET_GetAllProduct", payload, callback, loading });
+    GET_AllCompany(payload, callback, loading) {
+      dispatch({ type: "GET_AllCompany", payload, callback, loading });
     },
-    GET_dropDownInventory(payload, callback, loading) {
-      dispatch({ type: "GET_dropDownInventory", payload, callback, loading });
+    POST_AddCompany(payload, callback, loading) {
+      dispatch({ type: "POST_AddCompany", payload, callback, loading });
     },
-    GET_dropDownProductType(payload, callback, loading) {
-      dispatch({ type: "GET_dropDownProductType", payload, callback, loading });
+    PUT_EditCompany(payload, callback, loading) {
+      dispatch({ type: "PUT_EditCompany", payload, callback, loading });
+    },
+    PUT_DelCompany(payload, callback, loading) {
+      dispatch({ type: "PUT_DelCompany", payload, callback, loading });
+    },
+    POST_AddCompanyCsv(payload, callback, loading) {
+      dispatch({ type: "POST_AddCompanyCsv", payload, callback, loading });
     },
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Product);
+export default connect(mapStateToProps, mapDispatchToProps)(Company);

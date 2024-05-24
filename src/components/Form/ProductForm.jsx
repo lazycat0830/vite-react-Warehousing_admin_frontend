@@ -11,16 +11,31 @@ import {
   Image,
   FileInput,
   Title,
+  TagsInput
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 
-const ProductForm = (props) => {
-  const [addColorData, setAddColorData] = useState([]);
-  const [addSizeData, setAddSizeData] = useState([]);
-  const [colorList, setColorList] = useState([]);
-  const [sizeList, setSizeList] = useState([]);
+const ProductForm = (
+  {
+  editRow= {
+  pro_id: null,
+  com_id: null,
+  pro_comName: "",
+  pro_homemadeName: "",
+  type_id: null,
+  pro_cost: 0,
+  pro_price: 0,
+  pro_color:[],
+  pro_size:[],
+  },
+  pro_img= null,
+  comDropDown= [],
+  typeDropDown= [],
+  type,
+  onSubmit,
+  resetForm
+}) => {
   const [imgFile, setImgFile] = useState(null);
-  const { editRow, pro_img, type, comDropDown, typeDropDown } = props;
 
   useEffect(() => {
     setImgFile(pro_img);
@@ -30,10 +45,8 @@ const ProductForm = (props) => {
     initialValues: editRow,
   });
 
-  const onSubmit = () => {
-    Form.values.pro_style.color = colorList;
-    Form.values.pro_style.size = sizeList;
-    props.onSubmit(Form.values, imgFile, type);
+  const SubmitForm = () => {
+    onSubmit(Form.values, imgFile, type);
   };
 
   return (
@@ -71,7 +84,7 @@ const ProductForm = (props) => {
                       : URL.createObjectURL(imgFile)
                   }
                   alt="updateImage"
-                  withPlaceholder
+                  fallbackSrc="https://placehold.co/600x400?text="
                 />
               </div>
             )}
@@ -84,7 +97,7 @@ const ProductForm = (props) => {
               label="廠商"
               placeholder="選擇廠商"
               searchable
-              nothingFound="No options"
+              nothingFoundMessage="No options"
               data={comDropDown}
               required
               {...Form.getInputProps("com_id")}
@@ -103,7 +116,7 @@ const ProductForm = (props) => {
               placeholder="選擇類型"
               searchable
               defaultValue={1}
-              nothingFound="No options"
+              nothingFoundMessage="No options"
               data={typeDropDown}
               clearable
               {...Form.getInputProps("type_id")}
@@ -112,24 +125,16 @@ const ProductForm = (props) => {
               required
               label="售價"
               min={0}
-              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-              formatter={(value) =>
-                !Number.isNaN(parseFloat(value))
-                  ? `$ ${value}`.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
-                  : "$ "
-              }
+              thousandSeparator=","
+              prefix="$"
               {...Form.getInputProps("pro_price")}
             />
             <NumberInput
               required
               label="成本"
               min={0}
-              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-              formatter={(value) =>
-                !Number.isNaN(parseFloat(value))
-                  ? `$ ${value}`.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
-                  : "$ "
-              }
+              thousandSeparator=","
+              prefix="$"
               {...Form.getInputProps("pro_cost")}
             />
           </Tabs.Panel>
@@ -137,7 +142,7 @@ const ProductForm = (props) => {
             <Title pb={5} order={4}>
               商品規格
             </Title>
-            <MultiSelect
+            {/* <MultiSelect
               label="顏色"
               data={addColorData}
               value={colorList}
@@ -180,19 +185,21 @@ const ProductForm = (props) => {
                   event.preventDefault();
                 }
               }}
-            />
+            /> */}
+            <TagsInput label="顏色" placeholder="Enter add" {...Form.getInputProps("pro_color")}/>
+            <TagsInput label="尺寸" placeholder="Enter add" {...Form.getInputProps("pro_size")}/>
           </Tabs.Panel>
         </Tabs>
         <Group position="right" spacing="xs">
           <Button
             type="button"
-            onClick={() => onSubmit()} // 這裡不需要箭頭函數
+            onClick={() => SubmitForm()} // 這裡不需要箭頭函數
           >
             {type === "add" ? "新增" : "修改"}
           </Button>
           <Button
             type="button" // 如果要取消，type應該是button
-            onClick={() => props.resetForm()} // 這裡可以添加取消功能的函數
+            onClick={() => resetForm()} // 這裡可以添加取消功能的函數
           >
             取消
           </Button>
@@ -202,20 +209,5 @@ const ProductForm = (props) => {
   );
 };
 
-ProductForm.defaultProps = {
-  editRow: {
-    pro_id: null,
-    com_id: null,
-    pro_comName: "",
-    pro_homemadeName: "",
-    type_id: null,
-    pro_cost: 0,
-    pro_price: 0,
-    pro_style: { color: [], size: [] },
-  },
-  pro_img: null,
-  comDropDown: [],
-  typeDropDown: [],
-};
 
 export default ProductForm;

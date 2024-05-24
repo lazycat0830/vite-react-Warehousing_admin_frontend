@@ -2,13 +2,7 @@ import React from "react";
 import { TextInput, Button, Stack, Group } from "@mantine/core";
 import { useForm } from "@mantine/form";
 
-const ProductTypeForm = ({
-  editRow= {
-    type_title: "",
-  },
-  type,
-  onSubmit
-}) => {
+const PurchaseForm = ({ editRow={}, type,onSubmit }) => {
   const Form = useForm({
     initialValues: editRow,
     validationRules: {
@@ -23,7 +17,6 @@ const ProductTypeForm = ({
   return (
     <form>
       <Stack>
-        <TextInput label="類型名稱" {...Form.getInputProps("type_title")} />
         <Group position="right" spacing="xs">
           <Button
             type="button"
@@ -44,4 +37,5 @@ const ProductTypeForm = ({
 };
 
 
-export default ProductTypeForm;
+
+export default PurchaseForm;
