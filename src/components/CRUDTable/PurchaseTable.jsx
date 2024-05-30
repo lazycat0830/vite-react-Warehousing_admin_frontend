@@ -30,7 +30,7 @@ import "./CompanyTable.scss";
 const PurchaseTable = ({rows = [],openModal}) => {
   const [activePage, setActivitePage] = useState(1);
   const [itemPage, setitemPage] = useState(10);
-
+  
 
   const paginatedData = _.chunk(rows, itemPage);
 

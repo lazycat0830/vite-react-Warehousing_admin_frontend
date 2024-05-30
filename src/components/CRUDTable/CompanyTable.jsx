@@ -110,6 +110,7 @@ const CompanyTable = ({rows = [],openModal}) => {
     </Table.Tr>
   ));
 
+
   // 刪除多廠商
   const onSubmit = () => {
     const checkedItems = [];

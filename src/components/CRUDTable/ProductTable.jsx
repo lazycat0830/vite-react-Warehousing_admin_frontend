@@ -149,7 +149,7 @@ const ProductTable = ({rows = [],openModal}) => {
 
   return (
     <div id="ProductTable">
-      <Group position="apart" spacing="xs" style={{ paddingBottom: "6px" }}>
+      <Group justify="space-between" spacing="xs" style={{ paddingBottom: "6px" }}>
         <Group>
           <Button onClick={clearCheck}>{isListChange ? "取消" : "選擇"}</Button>
           {isListChange && <Button onClick={onSubmit}>刪除</Button>}
@@ -213,7 +213,7 @@ const ProductTable = ({rows = [],openModal}) => {
           </Table.Tbody>
         </Table>
       </div>
-      <Group position="center" style={{ marginTop: "12px" }}>
+      <Group justify="center" style={{ marginTop: "12px" }}>
         <Pagination
           total={maxPage}
           value={activePage}

@@ -9,7 +9,7 @@ import Inventory from '../pages/backdesk/Inventory/Inventory'
 import Component from '../pages/backdesk/Inventory/Company/Company'
 import Purchase from '../pages/backdesk/Inventory/Purchase/Purchase'
 import ReportAnalysis from '../pages/backdesk/ReportAnalysis/ReportAnalysis'
-import Setting from '../pages/backdesk/Setting/Setting'
+import {Information,Setting,SettingUser,SettingPay} from "../pages/backdesk/Setting/index";
 
 import SalesInerface from "../pages/frontdesk/sales/SalesInerface"
 
@@ -66,8 +66,14 @@ export const router = createBrowserRouter([
         element: <ReportAnalysis/>,
       },
       {
-        path: "/backdesk/Setting",
-        element: <Setting/>,
+        path: "/backdesk/Information",
+        element: <Information/>,
+      },{
+        path: "/backdesk/SettingPay",
+        element: <SettingPay/>,
+      },{
+        path: "/backdesk/SettingUser",
+        element: <SettingUser/>,
       },
     ],
   },

@@ -27,7 +27,7 @@ import {
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import "./CompanyTable.scss";
 
-const ProductTypeTable = ({rows = [],openModal}) => {
+const SettingPayTable = ({rows = [],openModal}) => {
   const [activePage, setActivitePage] = useState(1);
   const [itemPage, setitemPage] = useState(10);
   const [isListChange, setIsListChange] = useState(false);
@@ -204,4 +204,4 @@ const ProductTypeTable = ({rows = [],openModal}) => {
 };
 
 
-export default ProductTypeTable;
+export default SettingPayTable;

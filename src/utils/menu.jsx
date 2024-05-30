@@ -105,29 +105,23 @@ export default [
     icon: faSlidersH,
     children: [
       {
-        path: `/backdesk/Setting`,
+        path: `/backdesk/Information`,
         title: "基本資料",
         useable: false,
         id: "D01",
       },
       {
-        path: `/backdesk/Setting`,
+        path: `/backdesk/SettingUser`,
         title: "員工",
         useable: false,
         id: "D01",
       },
       {
-        path: `/backdesk/Setting`,
+        path: `/backdesk/SettingPay`,
         title: "付款設定",
         useable: false,
         id: "D01",
-      },
-      {
-        path: `/backdesk/Setting`,
-        title: "管理員設定",
-        useable: false,
-        id: "D01",
-      },
+      }
     ],
   },
 ];
