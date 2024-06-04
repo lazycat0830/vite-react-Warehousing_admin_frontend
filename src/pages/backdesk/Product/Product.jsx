@@ -17,7 +17,7 @@ import {
   ActionIcon,
   Button,
   Modal,
-  Select,
+  Select ,
   MultiSelect,
 } from "@mantine/core";
 import {
@@ -28,6 +28,7 @@ import {
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import ProductTable from "../../../components/CRUDTable/ProductTable";
 import ProductForm from "../../../components/Form/ProductForm";
+import ShowImgForm from "../../../components/Form/ShowImgForm";
 
 const Product = (props) => {
   const [token, setToken] = useState(null);
@@ -36,7 +37,9 @@ const Product = (props) => {
   const [modalType, setModalType] = useState("add");
   const [EditRow, setEditRow] = useState({});
   const [csvFile, setCsvFile] = useState(null);
-  const { GET_GetAllProduct, GET_dropDownInventory, GET_dropDownProductType } =
+  const [CsvComID, setCsvCom] = useState(null);
+
+  const { GET_GetAllProduct,POST_AddProduct,PUT_EditProduct,PUT_DelProduct, GET_dropDownCompany, GET_dropDownProductType,POST_AddProductCsv,PUT_EditProductImg,PUT_DelProductImg } =
     props;
   const { AllProduct, Company, ProductType } = props;
 
@@ -57,7 +60,7 @@ const Product = (props) => {
     const fetch = async () => {
       if (token) {
         await GET_GetAllProduct();
-        await GET_dropDownInventory();
+        await GET_dropDownCompany();
         await GET_dropDownProductType();
       }
     };
@@ -65,7 +68,7 @@ const Product = (props) => {
   }, [
     token,
     GET_GetAllProduct,
-    GET_dropDownInventory,
+    GET_dropDownCompany,
     GET_dropDownProductType,
   ]);
   const ModalTitles = {
@@ -73,6 +76,7 @@ const Product = (props) => {
     edit: "修改商品",
     delete: "下架商品",
     addCSV: "csv檔新增商品",
+    showImg:"顯示圖片"
   };
 
   // 開啟彈窗
@@ -87,8 +91,7 @@ const Product = (props) => {
     setOpenedModal(false);
   };
 
-  const onSubmit = (value, img, type) => {
-    console.log(value, img, type);
+  const onSubmit = async(value, img, type,ImgAction) => {
     const {
       pro_id,
       com_id,
@@ -99,6 +102,7 @@ const Product = (props) => {
       pro_price,
       pro_color,
       pro_size,
+      ListPro
     } = value;
     const data = new FormData();
     data.append("com_id", com_id);
@@ -107,22 +111,41 @@ const Product = (props) => {
     data.append("type_id", type_id);
     data.append("pro_cost", pro_cost);
     data.append("pro_price", pro_price);
-    data.append("pro_style", JSON.stringify({color:pro_color,size:pro_size}));
+    data.append("pro_style",(pro_color!==undefined)?JSON.stringify({color:pro_color,size:pro_size}):'{}');
     data.append("pro_img", img);
-    if (com_id) {
+    if (com_id || (type === "table")) {
       if (type === "add") {
-        // await POST_AddCompany(body);
+        await POST_AddProduct(data);
       } else if (type === "edit") {
         data.append("pro_id", pro_id);
-        // await PUT_EditCompany(body);
+        await PUT_EditProduct(data);
+      } else if(type === "showImg" && ImgAction === "editImg"){
+        data.append("pro_id", pro_id);
+        await PUT_EditProductImg(data);
+      } else if(type === "showImg" && ImgAction === "delImg"){
+        await PUT_DelProductImg({ListPro:pro_id.split()});
+      } else if(type === "table" && ImgAction === "delImg"){
+        await PUT_DelProductImg({ListPro:ListPro});
+      }else if(type === "table" && ImgAction === "delPro"){
+        await PUT_DelProduct({ListPro:ListPro});
       }
       setOpenedModal(false);
     }
   };
+  const onCsvSubmit=async()=>{
+    if(CsvComID&&csvFile){
+      const csvData=new FormData();
+      csvData.append("com_id",CsvComID);
+      csvData.append("ProductCSV",csvFile);
+      await POST_AddProductCsv(csvData);
+      setOpenedModal(false);
+    }
+    setCsvCom(null);
+  }
 
   return (
     <div id="Product">
-      <ProductTable rows={AllProduct} openModal={openModal} />
+      <ProductTable rows={AllProduct} openModal={openModal} onSubmit={onSubmit}/>
       <Modal
         size="xl"
         opened={openedModal}
@@ -145,6 +168,8 @@ const Product = (props) => {
             type={"edit"}
             comDropDown={Company}
             typeDropDown={ProductType}
+            editRow={EditRow}
+            pro_img={EditRow.pro_img}
           />
         )}
         {modalType === "delete" && (
@@ -165,14 +190,19 @@ const Product = (props) => {
         )}
         {modalType === "addCSV" && (
           <Stack>
+            <Select
+              label="選擇廠商"
+              data={Company}
+              onChange={setCsvCom}
+            />
             <FileInput label="CSV檔" onChange={setCsvFile} withAsterisk />
-            <a href="/public/CSV/Company.csv" download="廠商csv檔範本.csv">
-              廠商csv檔範本
+            <a href="/public/CSV/Product.csv" download="商品csv檔範本.csv">
+              商品csv檔範本
             </a>
             <Group position="right" spacing="xs">
               <Button
                 type="button"
-                onClick={() => addCsvForm()} // 這裡不需要箭頭函數
+                onClick={() => onCsvSubmit()} // 這裡不需要箭頭函數
               >
                 確認
               </Button>
@@ -182,6 +212,12 @@ const Product = (props) => {
             </Group>
           </Stack>
         )}
+        {
+          modalType ==="showImg" && (
+            <ShowImgForm editRow={EditRow} 
+            onSubmit={onSubmit} type={"showImg"}/>
+          )
+        }
       </Modal>
     </div>
   );
@@ -200,11 +236,29 @@ const mapDispatchToProps = (dispatch) => {
     GET_GetAllProduct(payload, callback, loading) {
       dispatch({ type: "GET_GetAllProduct", payload, callback, loading });
     },
-    GET_dropDownInventory(payload, callback, loading) {
-      dispatch({ type: "GET_dropDownInventory", payload, callback, loading });
+    POST_AddProduct(payload, callback, loading) {
+      dispatch({ type: "POST_AddProduct", payload, callback, loading });
+    },
+    PUT_EditProduct(payload, callback, loading) {
+      dispatch({ type: "PUT_EditProduct", payload, callback, loading });
+    },
+    PUT_DelProduct(payload, callback, loading) {
+      dispatch({ type: "PUT_DelProduct", payload, callback, loading });
+    },
+    GET_dropDownCompany(payload, callback, loading) {
+      dispatch({ type: "GET_dropDownCompany", payload, callback, loading });
     },
     GET_dropDownProductType(payload, callback, loading) {
       dispatch({ type: "GET_dropDownProductType", payload, callback, loading });
+    },
+    POST_AddProductCsv(payload, callback, loading) {
+      dispatch({ type: "POST_AddProductCsv", payload, callback, loading });
+    },
+    PUT_EditProductImg(payload, callback, loading) {
+      dispatch({ type: "PUT_EditProductImg", payload, callback, loading });
+    },
+    PUT_DelProductImg(payload, callback, loading) {
+      dispatch({ type: "PUT_DelProductImg", payload, callback, loading });
     },
   };
 };

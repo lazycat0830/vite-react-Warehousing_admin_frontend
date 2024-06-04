@@ -125,7 +125,7 @@ const Company = (props) => {
   // 用csv檔新增
   const addCsvForm = async () => {
     const data = new FormData();
-    data.append("Company", csvFile);
+    data.append("CompanyCSV", csvFile);
     if (csvFile) {
       await POST_AddCompanyCsv(data);
       setOpenedModal(false);

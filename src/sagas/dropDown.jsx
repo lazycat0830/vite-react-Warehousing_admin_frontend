@@ -8,15 +8,15 @@ import { GET_AllProductType } from "../services/productType";
 
 const CompanyDropdown = (data) =>
   _.map(data, (item) => {
-    return { label: item.com_name, value: item.com_id };
+    return { label: item.com_name, value: item["com_id"].toString() };
   });
 
 const ProductTypeDropdown = (data) =>
   _.map(data, (item) => {
-    return { label: item.type_title, value: item.type_id };
+    return { label: item.type_title, value: item["type_id"].toString() };
   });
 
-function* GET_dropDownInventoryEffect({ payload }) {
+function* GET_dropDownCompanyEffect({ payload }) {
   try {
     yield Loading({
       color: "cyan",
@@ -61,6 +61,6 @@ function* GET_dropDownProductTypeEffect({ payload }) {
 }
 
 export default function* Example() {
-  yield takeLatest("GET_dropDownInventory", GET_dropDownInventoryEffect);
+  yield takeLatest("GET_dropDownCompany", GET_dropDownCompanyEffect);
   yield takeLatest("GET_dropDownProductType", GET_dropDownProductTypeEffect);
 }

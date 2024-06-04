@@ -28,7 +28,7 @@ import {
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import "./CompanyTable.scss";
 
-const ProductTable = ({rows = [],openModal}) => {
+const ProductTable = ({rows = [],openModal,onSubmit}) => {
   const [activePage, setActivitePage] = useState(1);
   const [itemPage, setitemPage] = useState(10);
   const [isListChange, setIsListChange] = useState(false);
@@ -89,6 +89,7 @@ const ProductTable = ({rows = [],openModal}) => {
             src={row.pro_img}
             alt={`img${row.pro_id}`}
             fallbackSrc={`https://placehold.co/600x400?text=${!row.pro_homemadeName ? row.pro_comName : row.pro_homemadeName}`}
+            onClick={() => openModal("showImg", row)}
           />
         </div>
         {/* <img
@@ -127,7 +128,7 @@ const ProductTable = ({rows = [],openModal}) => {
   ));
 
   // 刪除多廠商
-  const onSubmit = () => {
+  const SubmitForm = (ImgAction) => {
     const checkedItems = [];
     paginatedData.forEach((page) => {
       page.forEach((row) => {
@@ -136,7 +137,14 @@ const ProductTable = ({rows = [],openModal}) => {
         }
       });
     });
-    console.log(checkedItems);
+    
+    if(ImgAction==="delImg"){
+      onSubmit({ListPro:checkedItems},null,"table",ImgAction)
+      setIsListChange(!isListChange);
+    }else if(ImgAction==="delPro"){
+      onSubmit({ListPro:checkedItems},null,"table",ImgAction)
+      setIsListChange(!isListChange);
+    }
   };
   const clearCheck = () => {
     const updatedPaginatedData = paginatedData.map((page) =>
@@ -152,7 +160,8 @@ const ProductTable = ({rows = [],openModal}) => {
       <Group justify="space-between" spacing="xs" style={{ paddingBottom: "6px" }}>
         <Group>
           <Button onClick={clearCheck}>{isListChange ? "取消" : "選擇"}</Button>
-          {isListChange && <Button onClick={onSubmit}>刪除</Button>}
+          {isListChange && (<><Button onClick={()=>SubmitForm("delPro")}>刪除</Button><Button onClick={()=>SubmitForm("delImg")}>清除圖片
+          </Button></>)}
         </Group>
         <Group>
           <Button

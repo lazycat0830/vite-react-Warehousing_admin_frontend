@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextInput,
   Button,
@@ -6,63 +6,60 @@ import {
   Group,
   Select,
   NumberInput,
-  MultiSelect,
   Tabs,
   Image,
   FileInput,
   Title,
-  TagsInput
+  TagsInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 
-const ProductForm = (
-  {
-  editRow= {
-  pro_id: null,
-  com_id: null,
-  pro_comName: "",
-  pro_homemadeName: "",
-  type_id: null,
-  pro_cost: 0,
-  pro_price: 0,
-  pro_color:[],
-  pro_size:[],
+const ProductForm = ({
+  editRow = {
+    pro_id: "",
+    com_id: null,
+    pro_comName: "",
+    pro_homemadeName: "",
+    type_id: null,
+    pro_cost: 0,
+    pro_price: 0,
+    pro_color: [],
+    pro_size: [],
+    pro_style: "",
   },
-  pro_img= null,
-  comDropDown= [],
-  typeDropDown= [],
+  pro_img = null,
+  comDropDown = [],
+  typeDropDown = [],
   type,
   onSubmit,
-  resetForm
+  resetForm,
 }) => {
-  const [imgFile, setImgFile] = useState(null);
+  const [imgFile, setImgFile] = useState(pro_img);
 
-  useEffect(() => {
-    setImgFile(pro_img);
-  }, [pro_img]);
-
-  const Form = useForm({
+  const form = useForm({
     initialValues: editRow,
   });
 
-  const SubmitForm = () => {
-    onSubmit(Form.values, imgFile, type);
+  const handleSubmit = () => {
+    onSubmit(form.values, imgFile, type);
   };
 
   return (
     <form>
       <Stack>
-        <Tabs variant="outline" defaultValue="mainImg">
+        <Tabs variant="outline" defaultValue={type==="add"?"mainImg":"productInf"}>
           <Tabs.List grow>
-            <Tabs.Tab value="mainImg">圖片</Tabs.Tab>
+            {type==="add" && (<Tabs.Tab value="mainImg">圖片</Tabs.Tab>)}
             <Tabs.Tab value="productInf">商品資訊</Tabs.Tab>
             <Tabs.Tab value="specification">商品規格</Tabs.Tab>
           </Tabs.List>
-          <Tabs.Panel value="mainImg" pt="xs">
+          {
+            type==="add" && (<Tabs.Panel value="mainImg" pt="xs">
             <Title pb={5} order={4}>
               主要圖片
             </Title>
             <FileInput
+              pb={10}
               style={{ width: "100%" }}
               accept="image/png,image/jpeg,image/svg,image/jpg"
               label=""
@@ -72,23 +69,24 @@ const ProductForm = (
               clearable
               onChange={setImgFile}
             />
-            {imgFile && (
-              <div>
-                <Image
-                  radius="xs"
-                  height={300}
-                  fit="scale-down"
-                  src={
-                    typeof imgFile === "string"
-                      ? imgFile
-                      : URL.createObjectURL(imgFile)
-                  }
-                  alt="updateImage"
-                  fallbackSrc="https://placehold.co/600x400?text="
-                />
-              </div>
-            )}
-          </Tabs.Panel>
+            <div>
+              <Image
+                radius="xs"
+                height={300}
+                fit="scale-down"
+                src={
+                  typeof imgFile === "string"
+                    ? imgFile
+                    : imgFile instanceof Blob
+                    ? URL.createObjectURL(imgFile)
+                    : null
+                }
+                alt="updateImage"
+                fallbackSrc={`https://placehold.co/600x400?text=${editRow?.pro_homemadeName || editRow?.pro_comName}`}
+              />
+            </div>
+          </Tabs.Panel>)
+          }
           <Tabs.Panel value="productInf" pt="xs">
             <Title pb={5} order={4}>
               商品資訊
@@ -97,29 +95,29 @@ const ProductForm = (
               label="廠商"
               placeholder="選擇廠商"
               searchable
+              disabled={type==="edit"}
               nothingFoundMessage="No options"
               data={comDropDown}
               required
-              {...Form.getInputProps("com_id")}
+              {...form.getInputProps("com_id")}
             />
             <TextInput
               required
               label="廠商商品編號"
-              {...Form.getInputProps("pro_comName")}
+              {...form.getInputProps("pro_comName")}
             />
             <TextInput
               label="自訂商品編號"
-              {...Form.getInputProps("pro_homemadeName")}
+              {...form.getInputProps("pro_homemadeName")}
             />
             <Select
               label="商品類型"
               placeholder="選擇類型"
               searchable
-              defaultValue={1}
               nothingFoundMessage="No options"
               data={typeDropDown}
               clearable
-              {...Form.getInputProps("type_id")}
+              {...form.getInputProps("type_id")}
             />
             <NumberInput
               required
@@ -127,7 +125,7 @@ const ProductForm = (
               min={0}
               thousandSeparator=","
               prefix="$"
-              {...Form.getInputProps("pro_price")}
+              {...form.getInputProps("pro_price")}
             />
             <NumberInput
               required
@@ -135,72 +133,22 @@ const ProductForm = (
               min={0}
               thousandSeparator=","
               prefix="$"
-              {...Form.getInputProps("pro_cost")}
+              {...form.getInputProps("pro_cost")}
             />
           </Tabs.Panel>
           <Tabs.Panel value="specification" pt="xs">
             <Title pb={5} order={4}>
               商品規格
             </Title>
-            {/* <MultiSelect
-              label="顏色"
-              data={addColorData}
-              value={colorList}
-              searchable
-              creatable
-              getCreateLabel={(query) => `+ 新增 ${query}`}
-              onChange={setColorList}
-              onCreate={(query) => {
-                // const item = { value: query, label: query };
-                setAddColorData((current) => [...current, query]);
-                return query;
-              }}
-              onKeyDown={(event) => {
-                if (event.keyCode === 13) {
-                  const query = event.target.value;
-                  setAddColorData((current) => [...current, query]);
-                  setColorList((current) => [...current, query]);
-                  event.preventDefault();
-                }
-              }}
-            />
-            <MultiSelect
-              label="尺寸"
-              data={addSizeData}
-              value={sizeList}
-              searchable
-              creatable
-              onChange={setSizeList}
-              getCreateLabel={(query) => `+ 新增 ${query}`}
-              onCreate={(query) => {
-                // const item = { value: query, label: query };
-                setAddSizeData((current) => [...current, query]);
-                return query;
-              }}
-              onKeyDown={(event) => {
-                if (event.keyCode === 13) {
-                  const query = event.target.value;
-                  setAddSizeData((current) => [...current, query]);
-                  setSizeList((current) => [...current, query]);
-                  event.preventDefault();
-                }
-              }}
-            /> */}
-            <TagsInput label="顏色" placeholder="Enter add" {...Form.getInputProps("pro_color")}/>
-            <TagsInput label="尺寸" placeholder="Enter add" {...Form.getInputProps("pro_size")}/>
+            <TagsInput label="顏色" placeholder="Enter add" {...form.getInputProps("pro_color")} />
+            <TagsInput label="尺寸" placeholder="Enter add" {...form.getInputProps("pro_size")} />
           </Tabs.Panel>
         </Tabs>
         <Group position="right" spacing="xs">
-          <Button
-            type="button"
-            onClick={() => SubmitForm()} // 這裡不需要箭頭函數
-          >
+          <Button type="button" onClick={handleSubmit}>
             {type === "add" ? "新增" : "修改"}
           </Button>
-          <Button
-            type="button" // 如果要取消，type應該是button
-            onClick={() => resetForm()} // 這裡可以添加取消功能的函數
-          >
+          <Button type="button" onClick={resetForm}>
             取消
           </Button>
         </Group>
@@ -208,6 +156,5 @@ const ProductForm = (
     </form>
   );
 };
-
 
 export default ProductForm;

@@ -15,3 +15,15 @@ export function PUT_EditProduct(payload) {
 export function PUT_DelProduct(payload) {
   return request.put("/Product/deleteProduct", payload);
 }
+
+export function POST_AddProductCsv(payload) {
+  return request.post("/Product/csvAddProduct", payload);
+}
+
+export function PUT_EditProductImg(payload) {
+  return request.put("/Product/editProductImg", payload);
+}
+
+export function PUT_DelProductImg(payload) {
+  return request.put("/Product/deleteProductImg", payload);
+}
