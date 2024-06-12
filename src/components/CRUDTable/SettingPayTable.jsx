@@ -27,13 +27,12 @@ import {
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import "./CompanyTable.scss";
 
-const SettingPayTable = ({rows = [],openModal}) => {
+const SettingPayTable = ({ rows = [], openModal }) => {
   const [activePage, setActivitePage] = useState(1);
   const [itemPage, setitemPage] = useState(10);
   const [isListChange, setIsListChange] = useState(false);
   const [paginatedData, setPaginatedData] = useState([]);
   const [allChecked, setAllChecked] = useState(false);
-
 
   useEffect(() => {
     const editPaginatedData = _.chunk(
@@ -69,7 +68,7 @@ const SettingPayTable = ({rows = [],openModal}) => {
   };
 
   const tbRows = _.map(paginatedData[activePage - 1], (row, index) => (
-    <Table.Tr key={row.type_id}>
+    <Table.Tr key={row.setpay_id}>
       {isListChange && (
         <Table.Td>
           <Checkbox
@@ -81,7 +80,7 @@ const SettingPayTable = ({rows = [],openModal}) => {
         </Table.Td>
       )}
       <Table.Td>{index + 1}</Table.Td>
-      <Table.Td>{row.type_title}</Table.Td>
+      <Table.Td>{row.setpay_name}</Table.Td>
       <Table.Td>
         <Group position="center" spacing="xs" grow>
           <Tooltip label="修改">
@@ -113,7 +112,7 @@ const SettingPayTable = ({rows = [],openModal}) => {
     paginatedData.forEach((page) => {
       page.forEach((row) => {
         if (row.checked) {
-          checkedItems.push(row.type_id);
+          checkedItems.push(row.setpay_id);
         }
       });
     });
@@ -130,18 +129,16 @@ const SettingPayTable = ({rows = [],openModal}) => {
 
   return (
     <div id="ProductTypeTable">
-      <Group justify="space-between" spacing="xs" style={{ paddingBottom: "6px" }}>
+      <Group
+        justify="space-between"
+        spacing="xs"
+        style={{ paddingBottom: "6px" }}
+      >
         <Group>
           <Button onClick={clearCheck}>{isListChange ? "取消" : "選擇"}</Button>
           {isListChange && <Button onClick={onSubmit}>刪除</Button>}
         </Group>
         <Group>
-          <Button
-            onClick={() => openModal("addCSV")}
-            leftSection={<Icon icon={faPlusSquare} />}
-          >
-            CSV新增
-          </Button>
           <Button
             onClick={() => openModal("add")}
             leftSection={<Icon icon={faPlusSquare} />}
@@ -202,6 +199,5 @@ const SettingPayTable = ({rows = [],openModal}) => {
     </div>
   );
 };
-
 
 export default SettingPayTable;

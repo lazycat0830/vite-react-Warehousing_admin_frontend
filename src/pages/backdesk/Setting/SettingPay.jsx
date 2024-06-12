@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import _ from "lodash";
+import { connect } from "react-redux";
 import {
   Text,
   Switch,
@@ -14,88 +15,102 @@ import {
   Button,
   Modal,
 } from "@mantine/core";
-import ProductTypeTable from "../../../components/CRUDTable/ProductTypeTable";
-import ProductTypeForm from "../../../components/Form/ProductTypeForm";
-
+import SettingPayTable from "../../../components/CRUDTable/SettingPayTable";
+import SettingPayForm from "../../../components/Form/SettingPayForm";
 
 const ModalTitles = {
   add: "新增付款類型",
   edit: "修改付款類型",
   delete: "刪除付款類型",
-  addCSV: "csv檔新增付款類型",
 };
 
-const SettingPay = () => {
+const SettingPay = (props) => {
+  const [token, setToken] = useState(null);
+  const [times, setTimes] = useState(0);
   const [openedModal, setOpenedModal] = useState(false);
   const [modalType, setModalType] = useState("add");
   const [EditRow, setEditRow] = useState({});
-  const [csvFile, setCsvFile] = useState(null);
 
-  
-// 開啟彈窗
-const openModal = (type, row) => {
-  setCsvFile(null);
-  setModalType(type);
-  // setEditRow(row);
-  setOpenedModal(true);
-};
-// 關閉彈窗
-const resetForm = () => {
-  setOpenedModal(false);
-};
+  const { GET_GetAllPay, POST_AddPayType } = props;
+  const { AllPayType } = props;
 
-// 新增/修改送出
-const onSubmit = async (values, type) => {
-  const { type_title, type_id } = values;
-  const body = {
-    type_title: type_title,
+  useEffect(() => {
+    const getToken = async () => {
+      const { TOKEN } = localStorage;
+      if (TOKEN) {
+        setToken(TOKEN);
+      } else if (times < 50) {
+        setTimeout(getToken, 2000);
+        setTimes(times + 1);
+      }
+    };
+    getToken();
+  }, [times]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      if (token) {
+        await GET_GetAllPay();
+      }
+    };
+    fetch();
+  }, [token, GET_GetAllPay]);
+
+  // 開啟彈窗
+  const openModal = (type, row) => {
+    setModalType(type);
+    setEditRow(row);
+    setOpenedModal(true);
   };
-  if (type_title) {
-    if (type === "add") {
-      // await POST_AddProductType(body);
-    } else if (type === "edit") {
-      body.type_id = type_id;
-      // await PUT_EditProductType(body);
-    }
-
+  // 關閉彈窗
+  const resetForm = () => {
     setOpenedModal(false);
-  }
-};
+  };
 
-  // 刪除
-  const deleteForm = async () => {
-    const body = { ListTypeId: EditRow?.type_id };
-    // await DELETE_DelProductType(body);
-    if (EditRow?.type_id) {
+  // 新增/修改送出
+  const onSubmit = async (values, type) => {
+    const { setpay_name, setpay_id } = values;
+    const body = {
+      setpay_name: setpay_name,
+    };
+    if (setpay_name) {
+      if (type === "add") {
+        await POST_AddPayType(body);
+      } else if (type === "edit") {
+        body.setpay_id = setpay_id;
+        // await PUT_EditProductType(body);
+      }
+
       setOpenedModal(false);
     }
   };
-    // 用csv檔新增
-    const addCsvForm = () => {
-      console.log(csvFile);
-      const data = new FormData();
-      data.append("Company", csvFile);
-      if (csvFile) {
-        setOpenedModal(false);
-      }
-    };
 
-  return (<div id="SettingPay">
-    <ProductTypeTable rows={[]} openModal={openModal} />
-    <Modal
+  // 刪除
+  const deleteForm = async () => {
+    const body = { ListTypeId: EditRow?.setpay_id };
+    // await DELETE_DelProductType(body);
+    if (EditRow?.setpay_id) {
+      setOpenedModal(false);
+    }
+  };
+
+  return (
+    <div id="SettingPay">
+      <SettingPayTable rows={AllPayType} openModal={openModal} />
+      <Modal
         opened={openedModal}
         onClose={() => setOpenedModal(false)}
         title={ModalTitles[modalType]}
       >
         {modalType === "add" && (
-          <ProductTypeForm
+          <SettingPayForm
             onSubmit={onSubmit}
             resetForm={resetForm}
             type={"add"}
           />
         )}
         {modalType === "edit" && (
-          <ProductTypeForm
+          <SettingPayForm
             onSubmit={onSubmit}
             resetForm={resetForm}
             editRow={EditRow}
@@ -118,27 +133,26 @@ const onSubmit = async (values, type) => {
             </Group>
           </Stack>
         )}
-        {modalType === "addCSV" && (
-          <Stack>
-            <FileInput label="CSV檔" onChange={setCsvFile} withAsterisk />
-            <a href="/public/CSV/Company.csv" download="廠商csv檔範本.csv">
-              廠商csv檔範本
-            </a>
-            <Group position="right" spacing="xs">
-              <Button
-                type="button"
-                onClick={() => addCsvForm()} // 這裡不需要箭頭函數
-              >
-                確認
-              </Button>
-              <Button type="button" onClick={() => resetForm()}>
-                取消
-              </Button>
-            </Group>
-          </Stack>
-        )}
       </Modal>
-  </div>);
+    </div>
+  );
 };
 
-export default SettingPay;
+const mapStateToProps = (state) => {
+  return {
+    AllPayType: _.get(state, "setting.AllPayType", []),
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    GET_GetAllPay(payload, callback, loading) {
+      dispatch({ type: "GET_GetAllPay", payload, callback, loading });
+    },
+    POST_AddPayType(payload, callback, loading) {
+      dispatch({ type: "POST_AddPayType", payload, callback, loading });
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SettingPay);

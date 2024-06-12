@@ -7,6 +7,7 @@ import productType from "./productType";
 import company from "./company";
 import Inventory from "./Inventory";
 import dropDown from "./dropDown";
+import setting from "./setting";
 
 export default combineReducers({
   global,
@@ -15,5 +16,6 @@ export default combineReducers({
   productType,
   company,
   Inventory,
-  dropDown
+  dropDown,
+  setting,
 });
